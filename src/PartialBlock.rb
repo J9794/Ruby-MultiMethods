@@ -14,4 +14,9 @@ class PartialBlock
     end
   end
 
+  def call(*parameters)
+    throw ArgumentError if !matches(*parameters)
+    block.call(*parameters)
+  end
+
 end
