@@ -1,3 +1,9 @@
+class Array
+  def sum(&block)
+    self.inject(0) do |seed, element| seed + block.call(element) end
+  end
+end
+
 class PartialBlock
 
   attr_reader :types, :block
@@ -17,6 +23,11 @@ class PartialBlock
   def call(*parameters)
     throw ArgumentError if !matches(*parameters)
     block.call(*parameters)
+  end
+
+  def parameters_distance(*parameters)
+    parameter_distance = proc do |type,parameter| parameter.class.ancestors.index(type) end
+    @types.zip(parameters).sum do |type,parameter| parameter_distance.call(type,parameter) end
   end
 
 end
