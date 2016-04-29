@@ -49,10 +49,17 @@ describe 'MultiMethods' do
 
   end
 
-  #describe 'Asking for the multimethods' do
+  describe 'Asking for the multimethods' do
 
-  #  expect(A.multimethods).to eq [:concat]
-  #  expect(A.multimethod(:concat)).to eq ??
-  #end
+    it 'should return one symbol representing the multimethod' do
+      expect(A.multimethods).to eq [:concat]
+    end
+    it 'should return the array of partialblocks which represents the multimethod' do
+      expect(A.multimethod(:concat).is_a? Array).to be true
+    end
+    it 'should be true that all of the elements on the array are partialblocks' do
+      expect(A.multimethod(:concat).all? do |mm| mm.is_a? PartialBlock end).to be true
+    end
+  end
 
 end

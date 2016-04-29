@@ -28,4 +28,12 @@ module PartialDefinable
     best_multi_method(symbol, *parameters).call(*parameters)
   end
 
+  def multimethods
+    @multi_methods_hash.keys
+  end
+
+  def multimethod(sym)
+    @multi_methods_hash[sym]
+  end
+
 end
