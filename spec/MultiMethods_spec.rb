@@ -6,7 +6,7 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a class' do
 
       class A
-        extend PartialDefinable
+        include PartialDefinable
         partial_def :concat, [String, String] do |s1,s2|
           s1 + s2
         end
@@ -71,7 +71,7 @@ describe 'MultiMethods' do
 
     my_object = Object.new
     my_object.singleton_class.class_eval do
-      extend PartialDefinable
+      include PartialDefinable
       partial_def :concat, [String, String] do |s1,s2|
         s1 + s2
       end
