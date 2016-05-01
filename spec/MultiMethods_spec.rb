@@ -54,7 +54,7 @@ describe 'MultiMethods' do
       describe 'Asking for the multimethods' do
 
         it 'should return one symbol representing the multimethod' do
-          expect(A.multimethods).to eq [:concat]
+          expect(A.multimethods).to eq [:respond_to?,:concat]
         end
         it 'should return the array of partialblocks which represents the multimethod' do
           expect(A.multimethod(:concat).is_a? Array).to be true
@@ -63,6 +63,42 @@ describe 'MultiMethods' do
           expect(A.multimethod(:concat).all? do |mm| mm.is_a? PartialBlock end).to be true
         end
       end
+
+    describe 'respond_to?' do
+
+      it 'should respond if the method is a known multimethod' do
+        expect(A.new.respond_to?(:concat)).to be true
+       end
+
+      it 'should respond if the method is a known regular method' do
+        expect(A.new.respond_to?(:to_s)).to be true
+      end
+
+      it 'should respond if the method is a known multimethod and the types are correct' do
+        expect(A.new.respond_to?(:concat, false, [String,String])).to be true
+      end
+
+      it 'should respond if the method is a known multimethod and the types are correct' do
+        expect(A.new.respond_to?(:concat, false, [Integer,A])).to be true
+      end
+
+      it 'should not respond if the method is a regular method and types are provided' do
+        expect(A.new.respond_to?(:to_s, false, [String]) ).to be false
+      end
+
+      it 'should not respond if the method is a multimethod but the types are not correct' do
+        expect(A.new.respond_to?(:concat, false, [String,String,String])).to be false
+      end
+
+      # true, define el método como multimethod
+        # true, define el método normalmente
+        # true, los tipos coinciden
+        # true, matchea con [Object, Object]
+        # false, no es un multimethod
+         # false, los tipos no coinciden
+
+
+    end
 
   end
 
@@ -118,7 +154,7 @@ describe 'MultiMethods' do
     describe 'Asking for the multimethods' do
 
       it 'should return one symbol representing the multimethod' do
-        expect(my_object.singleton_class.multimethods).to eq [:concat]
+        expect(my_object.singleton_class.multimethods).to eq [:respond_to?,:concat]
       end
       it 'should return the array of partialblocks which represents the multimethod' do
         expect(my_object.singleton_class.multimethod(:concat).is_a? Array).to be true
@@ -185,7 +221,7 @@ describe 'MultiMethods' do
     describe 'Asking for the multimethods' do
 
       it 'should return one symbol representing the multimethod' do
-        expect(B.multimethods).to eq [:concat, :b_method]
+        expect(B.multimethods).to eq [:respond_to?, :concat, :b_method]
       end
       it 'should return the array of partialblocks which represents the multimethod' do
         expect(B.multimethod(:concat).is_a? Array).to be true
