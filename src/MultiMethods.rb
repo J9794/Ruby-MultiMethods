@@ -9,8 +9,9 @@ module PartialDefinable
     @multi_methods_hash ||= {}
     @multi_methods_hash[symbol] ||= []
     @multi_methods_hash[symbol] << (PartialBlock.new types_list,&block)
+    behavior_provider = self
     self.send(:define_method,symbol) do |*parameters|
-      self.class.call_multi_method(symbol, *parameters)
+      behavior_provider.call_multi_method(symbol, *parameters)
     end
   end
 
