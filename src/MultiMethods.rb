@@ -5,10 +5,12 @@ end
 
 module PartialDefinable
 
+  attr_accessor :multi_methods_hash
+
   def partial_def (symbol, types_list, &block)
     @multi_methods_hash ||= {}
     @multi_methods_hash[symbol] ||= []
-    @multi_methods_hash[symbol] << (PartialBlock.new types_list,&block)
+    multi_methods_hash[symbol] << (PartialBlock.new types_list,&block)
     behavior_provider = self
     self.send(:define_method,symbol) do |*parameters|
       behavior_provider.call_multi_method(symbol, *parameters)
@@ -30,11 +32,11 @@ module PartialDefinable
   end
 
   def multimethods
-    @multi_methods_hash.keys
+    multi_methods_hash.keys
   end
 
   def multimethod(sym)
-    @multi_methods_hash[sym]
+    multi_methods_hash[sym]
   end
 
 end
