@@ -3,6 +3,12 @@ require_relative '../src/PartialBlock'
 class MultiMethods
 end
 
+class Module
+  def multi_methods_hash
+    {}
+  end
+end
+
 module PartialDefinable
 
   def self.included(includer)
@@ -12,7 +18,12 @@ module PartialDefinable
 
   module ClassPart
 
-    attr_accessor :multi_methods_hash
+    attr_writer :multi_methods_hash
+
+    def multi_methods_hash
+      @multi_methods_hash ||= superclass.multi_methods_hash
+      superclass.multi_methods_hash.merge @multi_methods_hash
+    end
 
     def partial_def (symbol, types_list, &block)
       @multi_methods_hash ||= {}
