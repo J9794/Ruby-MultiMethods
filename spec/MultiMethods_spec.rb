@@ -190,6 +190,7 @@ describe 'MultiMethods' do
     end
     class B < A
       partial_def(:b_method,[]) do "I am B" end
+      partial_def(:concat, [Array,String]) do |a,b| "#{a.join(', ')} y #{b}"end
     end
 
     describe 'Calling the methods' do
@@ -211,6 +212,9 @@ describe 'MultiMethods' do
         expect(B.new.concat(Object.new, 3)).to eq 'Objetos concatenados'
       end
 
+      it 'should choose the correct and closest method to execute' do
+        expect(B.new.concat(['horacio','la maga'], 'rocamadour')).to eq 'horacio, la maga y rocamadour'
+      end
 
       it 'should throw error if no compatible definition is available' do
         expect{B.new.concat('hello', 'world', '!')}.to raise_error ArgumentError

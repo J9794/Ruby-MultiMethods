@@ -43,7 +43,11 @@ module PartialDefinable
     def multi_methods_hash
       @multi_methods_hash ||= {}
       if(superclass <= PartialDefinable)
-        superclass.multi_methods_hash.merge @multi_methods_hash
+        inherited_multimethods = superclass.multi_methods_hash.clone
+        @multi_methods_hash.each do |sym,val|
+          inherited_multimethods[sym] ||= (inherited_multimethods[sym] || []) + val
+        end
+        inherited_multimethods
       else
         @multi_methods_hash
       end
@@ -65,7 +69,7 @@ module PartialDefinable
     end
 
     def best_multi_method (symbol, *parameters)
-      possible_methods = @multi_methods_hash[symbol].select do |multi_method|
+      possible_methods = multi_methods_hash[symbol].select do |multi_method|
         multi_method.matches(*parameters)
       end
       throw ArgumentError if possible_methods.empty?
