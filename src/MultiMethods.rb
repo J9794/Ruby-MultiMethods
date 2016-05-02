@@ -30,13 +30,7 @@ module PartialDefinable
         raise SuperMethodException
       end
       partial_def(:respond_to?, [Object, Object, Object]) do |sym, is_private, types|
-        if(behavior_provider.is_multimethod?(sym) && respond_to?(sym, is_private))
-          behavior_provider.multimethod(sym).any? do |partial_block|
-            partial_block.matches_type(*types)
-          end
-        else
-          false
-        end
+        behavior_provider.is_multimethod?(sym) && respond_to?(sym, is_private) && behavior_provider.multimethod(sym).any? { |partial_block| partial_block.matches_type(*types) }
       end
     end
   end
