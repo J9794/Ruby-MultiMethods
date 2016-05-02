@@ -14,9 +14,13 @@ class PartialBlock
   end
 
   def matches(*parameters)
-    return false if parameters.size != types.size
-    parameters.zip(types).all? do |parameter,type|
-      parameter.is_a? type
+    matches_type(*parameters.map {|p| p.class})
+  end
+
+  def matches_type(*parameter_types)
+    return false if parameter_types.size != types.size
+    parameter_types.zip(types).all? do |parameter_type,type|
+      parameter_type <= type
     end
   end
 

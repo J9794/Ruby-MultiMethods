@@ -30,11 +30,9 @@ module PartialDefinable
         raise SuperMethodException
       end
       partial_def(:respond_to?, [Object, Object, Object]) do |sym, is_private, types|
-        if(behavior_provider.multimethods.include?(sym) && !is_private)
+        if(behavior_provider.is_multimethod?(sym) && respond_to?(sym, is_private))
           behavior_provider.multimethod(sym).any? do |partial_block|
-            partial_block.types.size.eql?(types.size) && partial_block.types.zip(types).all? do |pb_type,real_type|
-              real_type.ancestors.include? pb_type
-            end
+            partial_block.matches_type(types)
           end
         else
           false
@@ -92,6 +90,10 @@ module PartialDefinable
 
     def multimethod(sym)
       multi_methods_hash[sym]
+    end
+
+    def is_multimethod?(sym)
+      multimethods.include? sym
     end
   end
 
