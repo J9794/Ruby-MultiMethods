@@ -32,7 +32,7 @@ module PartialDefinable
       partial_def(:respond_to?, [Object, Object, Object]) do |sym, is_private, types|
         if(behavior_provider.is_multimethod?(sym) && respond_to?(sym, is_private))
           behavior_provider.multimethod(sym).any? do |partial_block|
-            partial_block.matches_type(types)
+            partial_block.matches_type(*types)
           end
         else
           false
@@ -63,7 +63,7 @@ module PartialDefinable
       behavior_provider = self
       self.send(:define_method, symbol) do |*parameters|
         begin
-          behavior_provider.call_multi_method(symbol, *parameters)
+          behavior_provider.call_multi_method(symbol, self, *parameters)
         rescue SuperMethodException => sup
           instance_exec super(*parameters), &sup.block
         end
@@ -80,8 +80,8 @@ module PartialDefinable
       end
     end
 
-    def call_multi_method (symbol, *parameters)
-      best_multi_method(symbol, *parameters).call(*parameters)
+    def call_multi_method (symbol, instance, *parameters)
+      instance.instance_exec *parameters, &best_multi_method(symbol, *parameters).block
     end
 
     def multimethods
