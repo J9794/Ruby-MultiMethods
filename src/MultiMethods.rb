@@ -17,12 +17,6 @@ class SuperMethodException < Exception
   end
 end
 
-class Module
-  def multi_methods_hash
-    {}
-  end
-end
-
 module PartialDefinable
 
   def self.included(includer)
@@ -55,9 +49,14 @@ module PartialDefinable
     attr_writer :multi_methods_hash
 
     def multi_methods_hash
-      @multi_methods_hash ||= superclass.multi_methods_hash
-      superclass.multi_methods_hash.merge @multi_methods_hash
+      @multi_methods_hash ||= {}
+      if(superclass <= PartialDefinable)
+        superclass.multi_methods_hash.merge @multi_methods_hash
+      else
+        @multi_methods_hash
+      end
     end
+
 
     def partial_def (symbol, types_list, &block)
       @multi_methods_hash ||= {}
