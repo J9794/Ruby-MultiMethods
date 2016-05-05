@@ -64,7 +64,7 @@ describe 'MultiMethods' do
         end
       end
 
-    describe 'respond_to?' do
+      describe 'respond_to?' do
 
       it 'should respond if the method is a known multimethod' do
         expect(A.new.respond_to?(:concat)).to be true
@@ -89,14 +89,6 @@ describe 'MultiMethods' do
       it 'should not respond if the method is a multimethod but the types are not correct' do
         expect(A.new.respond_to?(:concat, false, [String,String,String])).to be false
       end
-
-      # true, define el método como multimethod
-        # true, define el método normalmente
-        # true, los tipos coinciden
-        # true, matchea con [Object, Object]
-        # false, no es un multimethod
-         # false, los tipos no coinciden
-
 
     end
 
@@ -163,6 +155,35 @@ describe 'MultiMethods' do
         expect(my_object.singleton_class.multimethod(:concat).all? do |mm| mm.is_a? PartialBlock end).to be true
       end
     end
+
+    describe 'respond_to?' do
+
+      it 'should respond if the method is a known multimethod' do
+        expect(my_object.respond_to?(:concat)).to be true
+      end
+
+      it 'should respond if the method is a known regular method' do
+        expect(my_object.respond_to?(:to_s)).to be true
+      end
+
+      it 'should respond if the method is a known multimethod and the types are correct' do
+        expect(my_object.respond_to?(:concat, false, [String,String])).to be true
+      end
+
+      it 'should respond if the method is a known multimethod and the types are correct' do
+        expect(my_object.respond_to?(:concat, false, [Integer,A])).to be true
+      end
+
+      it 'should not respond if the method is a regular method and types are provided' do
+        expect(my_object.respond_to?(:to_s, false, [String]) ).to be false
+      end
+
+      it 'should not respond if the method is a multimethod but the types are not correct' do
+        expect(my_object.respond_to?(:concat, false, [String,String,String])).to be false
+      end
+
+    end
+
 
   end
 
@@ -238,6 +259,34 @@ describe 'MultiMethods' do
       end
       it 'should be true that all of the elements on the array are partialblocks' do
         expect(B.multimethod(:b_method).all? do |mm| mm.is_a? PartialBlock end).to be true
+      end
+
+    end
+
+    describe 'respond_to?' do
+
+      it 'should respond if the method is a known multimethod' do
+        expect(B.new.respond_to?(:concat)).to be true
+      end
+
+      it 'should respond if the method is a known regular method' do
+        expect(B.new.respond_to?(:to_s)).to be true
+      end
+
+      it 'should respond if the method is a known multimethod and the types are correct' do
+        expect(B.new.respond_to?(:concat, false, [String,String])).to be true
+      end
+
+      it 'should respond if the method is a known multimethod and the types are correct' do
+        expect(B.new.respond_to?(:concat, false, [Integer,A])).to be true
+      end
+
+      it 'should not respond if the method is a regular method and types are provided' do
+        expect(B.new.respond_to?(:to_s, false, [String]) ).to be false
+      end
+
+      it 'should not respond if the method is a multimethod but the types are not correct' do
+        expect(B.new.respond_to?(:concat, false, [String,String,String])).to be false
       end
 
     end
