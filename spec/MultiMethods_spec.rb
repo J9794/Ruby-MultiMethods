@@ -1,6 +1,30 @@
 require 'rspec'
 require_relative '../src/MultiMethods'
 
+concat_definition = proc do
+
+  partial_def :concat, [String, String] do |s1,s2|
+    s1 + s2
+  end
+
+  partial_def :concat, [String, Integer] do |s1,n|
+    s1 * n
+  end
+
+  partial_def :concat, [Array] do |a|
+    a.join
+  end
+
+  partial_def :concat, [Object, Object] do |_ , _|
+    'Objetos concatenados'
+  end
+
+  partial_def :concat, [String] do |name|
+    @text + name
+  end
+
+end
+
 shared_context 'Multimethods Behavior' do |receiver_instance, receiver_class, multi_methods_list|
 
   describe 'Calling the methods' do
@@ -94,27 +118,10 @@ describe 'MultiMethods' do
         end
 
         include PartialDefinable
-        partial_def :concat, [String, String] do |s1,s2|
-          s1 + s2
-        end
-
-        partial_def :concat, [String, Integer] do |s1,n|
-          s1 * n
-        end
-
-        partial_def :concat, [Array] do |a|
-          a.join
-        end
-
-        partial_def :concat, [Object, Object] do |_ , _|
-          'Objetos concatenados'
-        end
-
-        partial_def :concat, [String] do |name|
-          @text + name
-        end
 
       end
+
+      A.instance_eval &concat_definition
 
       include_context 'Multimethods Behavior',A.new,A,[:respond_to?,:concat]
 
@@ -126,29 +133,8 @@ describe 'MultiMethods' do
 
     my_object = Object.new
     my_object.instance_variable_set(:@text,'I am a singular object!, nice to meet you, ')
-    my_object.singleton_class.class_eval do
-
-      include PartialDefinable
-      partial_def :concat, [String, String] do |s1,s2|
-        s1 + s2
-      end
-
-      partial_def :concat, [String, Integer] do |s1,n|
-        s1 * n
-      end
-
-      partial_def :concat, [Array] do |a|
-        a.join
-      end
-
-      partial_def :concat, [Object, Object] do |_ , _|
-        'Objetos concatenados'
-      end
-
-      partial_def :concat, [String] do |name|
-        @text + name
-      end
-    end
+    my_object.singleton_class.include PartialDefinable
+    my_object.singleton_class.instance_eval &concat_definition
 
     include_context 'Multimethods Behavior',my_object,my_object.singleton_class,[:respond_to?,:concat]
 
@@ -164,25 +150,11 @@ describe 'MultiMethods' do
       end
 
       include PartialDefinable
-      partial_def :concat, [String, String] do |s1,s2|
-        s1 + s2
-      end
-
-      partial_def :concat, [String, Integer] do |s1,n|
-        s1 * n
-      end
-
-      partial_def :concat, [Array] do |a|
-        a.join
-      end
-
-      partial_def :concat, [Object, Object] do |_ , _|
-        'Objetos concatenados'
-      end
-
-
 
     end
+
+    A.instance_eval &concat_definition
+
     class B < A
       def initialize
         @text = "I'm a B!, "
@@ -242,27 +214,7 @@ describe 'MultiMethods' do
     my_object = Object.new
     my_object.instance_variable_set(:@text,'I am a singular object!, nice to meet you, ')
     my_object.extend PartialDefinable
-    my_object.instance_eval do
-      partial_def :concat, [String, String] do |s1,s2|
-        s1 + s2
-      end
-
-      partial_def :concat, [String, Integer] do |s1,n|
-        s1 * n
-      end
-
-      partial_def :concat, [Array] do |a|
-        a.join
-      end
-
-      partial_def :concat, [Object, Object] do |_ , _|
-        'Objetos concatenados'
-      end
-
-      partial_def :concat, [String] do |name|
-        @text + name
-      end
-    end
+    my_object.instance_eval &concat_definition
 
     include_context 'Multimethods Behavior',my_object,my_object.singleton_class,[:respond_to?,:concat]
 
