@@ -236,4 +236,37 @@ describe 'MultiMethods' do
 
   end
 
+
+  describe 'MultiMethods of an object' do
+
+    my_object = Object.new
+    my_object.instance_variable_set(:@text,'I am a singular object!, nice to meet you, ')
+    my_object.extend PartialDefinable
+    my_object.instance_eval do
+      partial_def :concat, [String, String] do |s1,s2|
+        s1 + s2
+      end
+
+      partial_def :concat, [String, Integer] do |s1,n|
+        s1 * n
+      end
+
+      partial_def :concat, [Array] do |a|
+        a.join
+      end
+
+      partial_def :concat, [Object, Object] do |_ , _|
+        'Objetos concatenados'
+      end
+
+      partial_def :concat, [String] do |name|
+        @text + name
+      end
+    end
+
+    include_context 'Multimethods Behavior',my_object,my_object.singleton_class,[:respond_to?,:concat]
+
+
+  end
+
 end

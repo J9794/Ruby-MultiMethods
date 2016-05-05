@@ -16,6 +16,12 @@ end
 
 module PartialDefinable
 
+  def self.extended(extender)
+    extender.extend ClassPart
+    extender.singleton_class.include PartialDefinable
+    extender.define_singleton_method(:partial_def) do |symbol, types_list, &block| singleton_class.partial_def(symbol, types_list, &block) end
+  end
+
   def self.included(includer)
     includer.extend ClassPart
     includer.instance_eval do
