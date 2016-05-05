@@ -34,4 +34,8 @@ class PartialBlock
     @types.zip(parameters).sum do |type,parameter| parameter_distance.call(type,parameter) end
   end
 
+  def same_signature?(partial_block)
+    partial_block.types == types
+  end
+
 end

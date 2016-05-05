@@ -42,22 +42,24 @@ module PartialDefinable
 
     def multi_methods_hash
       @multi_methods_hash ||= {}
-      if(superclass <= PartialDefinable)
-        inherited_multimethods = superclass.multi_methods_hash.clone
-        @multi_methods_hash.each do |sym,val|
-          inherited_multimethods[sym] ||= (inherited_multimethods[sym] || []) + val
+      return @multi_methods_hash unless superclass <= PartialDefinable
+      inherited_multimethods = superclass.multi_methods_hash
+      multimethod_symbols = @multi_methods_hash.keys + inherited_multimethods.keys
+      multimethod_symbols.map do |sym|
+        inherited_partial_blocks = inherited_multimethods[sym] || []
+        own_partial_blocks = @multi_methods_hash[sym] || []
+        resulting_blocks = own_partial_blocks + inherited_partial_blocks.reject do |pb|
+          own_partial_blocks.any? { |new_pb| new_pb.same_signature? pb }
         end
-        inherited_multimethods
-      else
-        @multi_methods_hash
-      end
+        {sym => resulting_blocks}
+      end.reduce(:merge)
     end
 
 
     def partial_def (symbol, types_list, &block)
       @multi_methods_hash ||= {}
       @multi_methods_hash[symbol] ||= []
-      multi_methods_hash[symbol] << (PartialBlock.new types_list, &block)
+      @multi_methods_hash[symbol] << (PartialBlock.new types_list, &block)
       behavior_provider = self
       self.send(:define_method, symbol) do |*parameters|
         begin

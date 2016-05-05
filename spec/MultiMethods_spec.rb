@@ -225,7 +225,7 @@ describe 'MultiMethods' do
     describe 'Asking for the multimethods' do
 
       it 'should return one symbol representing the multimethod' do
-        expect(B.multimethods).to eq [:respond_to?, :concat, :b_method]
+        expect(B.multimethods).to include :respond_to?, :concat, :b_method
       end
       it 'should return the array of partialblocks which represents the multimethod' do
         expect(B.multimethod(:concat).is_a? Array).to be true
