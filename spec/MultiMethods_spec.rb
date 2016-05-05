@@ -157,6 +157,8 @@ describe 'MultiMethods' do
 
     include_context 'Multimethods Behavior',B.new,B,{:@text => "I'm a B"},[:respond_to?,:concat,:b_method]
 
+    include_context 'Multimethods Behavior',A.new,A,{:@text => "I'm a B"},[:respond_to?,:concat]
+
     describe 'Multimethods of a subclass specific behavior' do
 
       describe 'Calling the methods' do
