@@ -22,7 +22,6 @@ module PartialDefinable
   def self.included(includer)
     includer.extend ClassPart
     includer.instance_eval do
-      behavior_provider = self
       partial_def(:respond_to?, [Object]) do
         raise SuperMethodException
       end
@@ -30,7 +29,9 @@ module PartialDefinable
         raise SuperMethodException
       end
       partial_def(:respond_to?, [Object, Object, Object]) do |sym, is_private, types|
-        behavior_provider.is_multimethod?(sym) && respond_to?(sym, is_private) && behavior_provider.multimethod(sym).any? { |partial_block| partial_block.matches_type(*types) }
+        singleton_class.is_multimethod?(sym) && respond_to?(sym, is_private)&& singleton_class.multimethod(sym).any? { |partial_block|
+          puts 'cant que le mando',types.size
+          partial_block.matches_type(*types) }
       end
     end
   end
@@ -44,7 +45,7 @@ module PartialDefinable
       @multi_methods_hash ||= {}
       return @multi_methods_hash unless superclass <= PartialDefinable
       inherited_multimethods = superclass.multi_methods_hash
-      multimethod_symbols = @multi_methods_hash.keys + inherited_multimethods.keys
+      multimethod_symbols = (@multi_methods_hash.keys + inherited_multimethods.keys).uniq
       multimethod_symbols.map do |sym|
         inherited_partial_blocks = inherited_multimethods[sym] || []
         own_partial_blocks = @multi_methods_hash[sym] || []
