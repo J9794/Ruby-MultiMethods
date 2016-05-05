@@ -32,6 +32,10 @@ shared_context 'Multimethods Behavior' do |receiver_instance, receiver_class, mu
 
     describe 'Methods that use self' do
 
+      it 'should use its instance variable' do
+        expect(receiver_instance.concat('Mr. Sarlomps')).to eq receiver_instance.instance_variable_get(:@text) + 'Mr. Sarlomps'
+      end
+
     end
 
   end
@@ -84,6 +88,11 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a class' do
 
       class A
+
+        def initialize
+          @text = "I'm an A, "
+        end
+
         include PartialDefinable
         partial_def :concat, [String, String] do |s1,s2|
           s1 + s2
@@ -101,6 +110,10 @@ describe 'MultiMethods' do
           'Objetos concatenados'
         end
 
+        partial_def :concat, [String] do |name|
+          @text + name
+        end
+
       end
 
       include_context 'Multimethods Behavior',A.new,A,[:respond_to?,:concat]
@@ -112,7 +125,9 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a singleton class' do
 
     my_object = Object.new
+    my_object.instance_variable_set(:@text,'I am a singular object!, nice to meet you, ')
     my_object.singleton_class.class_eval do
+
       include PartialDefinable
       partial_def :concat, [String, String] do |s1,s2|
         s1 + s2
@@ -128,6 +143,10 @@ describe 'MultiMethods' do
 
       partial_def :concat, [Object, Object] do |_ , _|
         'Objetos concatenados'
+      end
+
+      partial_def :concat, [String] do |name|
+        @text + name
       end
     end
 
@@ -140,6 +159,10 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a subclass' do
 
     class A
+      def initialize
+        @text = "I'm an A"
+      end
+
       include PartialDefinable
       partial_def :concat, [String, String] do |s1,s2|
         s1 + s2
@@ -157,11 +180,17 @@ describe 'MultiMethods' do
         'Objetos concatenados'
       end
 
+
+
     end
     class B < A
+      def initialize
+        @text = "I'm a B!, "
+      end
       partial_def(:b_method,[]) do "I am B" end
       partial_def(:b_method,[String]) do |nom| "I am #{nom}" end
       partial_def(:concat, [Array,String]) do |a,b| "#{a.join(', ')} y #{b}"end
+      partial_def :concat, [String] do |name|  @text + name  end
     end
 
     include_context 'Multimethods Behavior',B.new,B,[:respond_to?,:concat,:b_method]
