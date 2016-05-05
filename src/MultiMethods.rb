@@ -30,7 +30,6 @@ module PartialDefinable
       end
       partial_def(:respond_to?, [Object, Object, Object]) do |sym, is_private, types|
         singleton_class.is_multimethod?(sym) && respond_to?(sym, is_private)&& singleton_class.multimethod(sym).any? { |partial_block|
-          puts 'cant que le mando',types.size
           partial_block.matches_type(*types) }
       end
     end
