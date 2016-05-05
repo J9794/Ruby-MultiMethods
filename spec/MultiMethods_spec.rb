@@ -25,7 +25,11 @@ concat_definition = proc do
 
 end
 
-shared_context 'Multimethods Behavior' do |receiver_instance, receiver_class, multi_methods_list|
+shared_context 'Multimethods Behavior' do |receiver_instance, receiver_class, instance_variables, multi_methods_list|
+
+  instance_variables.each do |symbol, val|
+    receiver_instance.instance_variable_set(symbol,val)
+  end
 
   describe 'Calling the methods' do
 
@@ -112,18 +116,12 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a class' do
 
       class A
-
-        def initialize
-          @text = "I'm an A, "
-        end
-
         include PartialDefinable
-
       end
 
       A.instance_eval &concat_definition
 
-      include_context 'Multimethods Behavior',A.new,A,[:respond_to?,:concat]
+      include_context 'Multimethods Behavior',A.new,A,{:@text => "I'm an A, "},[:respond_to?,:concat]
 
 
   end
@@ -132,11 +130,11 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a singleton class' do
 
     my_object = Object.new
-    my_object.instance_variable_set(:@text,'I am a singular object!, nice to meet you, ')
     my_object.singleton_class.include PartialDefinable
     my_object.singleton_class.instance_eval &concat_definition
 
-    include_context 'Multimethods Behavior',my_object,my_object.singleton_class,[:respond_to?,:concat]
+    include_context 'Multimethods Behavior',my_object,my_object.singleton_class,
+                                            {:@text => 'I am a singular object!, nice to meet you, '},[:respond_to?,:concat]
 
 
   end
@@ -145,27 +143,19 @@ describe 'MultiMethods' do
   describe 'MultiMethods of a subclass' do
 
     class A
-      def initialize
-        @text = "I'm an A"
-      end
-
       include PartialDefinable
-
     end
 
     A.instance_eval &concat_definition
 
     class B < A
-      def initialize
-        @text = "I'm a B!, "
-      end
       partial_def(:b_method,[]) do "I am B" end
       partial_def(:b_method,[String]) do |nom| "I am #{nom}" end
       partial_def(:concat, [Array,String]) do |a,b| "#{a.join(', ')} y #{b}"end
       partial_def :concat, [String] do |name|  @text + name  end
     end
 
-    include_context 'Multimethods Behavior',B.new,B,[:respond_to?,:concat,:b_method]
+    include_context 'Multimethods Behavior',B.new,B,{:@text => "I'm a B"},[:respond_to?,:concat,:b_method]
 
     describe 'Multimethods of a subclass specific behavior' do
 
@@ -212,11 +202,11 @@ describe 'MultiMethods' do
   describe 'MultiMethods of an object' do
 
     my_object = Object.new
-    my_object.instance_variable_set(:@text,'I am a singular object!, nice to meet you, ')
     my_object.extend PartialDefinable
     my_object.instance_eval &concat_definition
 
-    include_context 'Multimethods Behavior',my_object,my_object.singleton_class,[:respond_to?,:concat]
+    include_context 'Multimethods Behavior',my_object,my_object.singleton_class,
+                    {:@text => 'I am a singular object!, nice to meet you, '},[:respond_to?,:concat]
 
 
   end
