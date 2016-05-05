@@ -1,8 +1,5 @@
 require_relative '../src/PartialBlock'
 
-class MultiMethods
-end
-
 class SuperMethodException < Exception
   attr_accessor :block
 
@@ -95,10 +92,6 @@ module PartialDefinable
     def is_multimethod?(sym)
       multimethods.include? sym
     end
-  end
-
-  module InstancePart
-
   end
 
 end
